@@ -44,47 +44,42 @@ object BookReviews : Table() {
 }
 
 fun Application.configureDatabase() {
-    // Проверяем путь к базе данных
     val dbFile = File("app.db")
     println("Database file path: ${dbFile.absolutePath}")
 
-    // Подключаемся к SQLite
     Database.connect(
         url = "jdbc:sqlite:${dbFile.absolutePath}",
         driver = "org.sqlite.JDBC"
     )
 
-    // Создаём таблицы, если они не существуют
     transaction {
         SchemaUtils.create(Users, BookCard, PurchasedBooks, BookReviews)
         println("Tables 'Users', 'BookCard', 'PurchasedBooks', and 'BookReviews' created or already exist")
 
-        // Добавляем несколько тестовых книг, если таблица BookCard пуста
         if (BookCard.selectAll().empty()) {
             BookCard.insert {
                 it[title] = "The Sixth Child"
                 it[author] = "Manith J."
                 it[price] = "$15.00"
-                it[imageId] = 1 // Соответствует R.drawable.the_sixth_child
+                it[imageId] = 1
                 it[description] = "Begin with eight Sisters..."
             }
             BookCard.insert {
                 it[title] = "The Book of God"
                 it[author] = "Walter Wangerin"
                 it[price] = "$16.88"
-                it[imageId] = 2 // Соответствует R.drawable.the_book_of_god
+                it[imageId] = 2
                 it[description] = "... a feat of imagination and faith."
             }
             BookCard.insert {
                 it[title] = "The Hobbit"
                 it[author] = "J.R.R. Tolkien"
                 it[price] = "$12.99"
-                it[imageId] = 3 // Соответствует R.drawable.the_hobbit
+                it[imageId] = 3
                 it[description] = "A classic fantasy novel..."
             }
         }
 
-        // Добавляем тестовый отзыв, если таблица BookReviews пуста
         if (BookReviews.selectAll().empty()) {
             val bookId = BookCard.select { BookCard.title eq "The Hobbit" }.first()[BookCard.id]
             val userId = Users.selectAll().firstOrNull()?.get(Users.id) ?: 1
